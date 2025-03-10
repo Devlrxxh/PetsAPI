@@ -31,6 +31,8 @@ public final class PetsAPI {
         runnables = new HashMap<>();
         skinDatas = new HashMap<>();
 
+        instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
+
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (List<MoveRunnable> runnable : runnables.values()) {
                 for (MoveRunnable moveRunnable : runnable) {
