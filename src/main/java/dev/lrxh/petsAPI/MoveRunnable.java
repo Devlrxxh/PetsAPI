@@ -58,6 +58,7 @@ public class MoveRunnable implements Runnable {
                 true);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
+            if (!online.canSee(player)) continue;
             PacketEvents.getAPI().getPlayerManager().sendPacket(online, teleport);
         }
     }

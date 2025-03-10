@@ -58,6 +58,7 @@ public final class PetsAPI {
         }
 
         for (Player online : Bukkit.getOnlinePlayers()) {
+            if (!online.canSee(player)) continue;
             load(online);
         }
     }
@@ -70,6 +71,21 @@ public final class PetsAPI {
                     PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
                 }
             }
+        }
+    }
+
+    static void load(Player player, Player watcher) {
+        for (Pet pet : pets.get(player.getUniqueId())) {
+            pet.getEntity().addViewer(player.getUniqueId());
+            for (PacketWrapper packet : pet.getPackets()) {
+                PacketEvents.getAPI().getPlayerManager().sendPacket(watcher, packet);
+            }
+        }
+    }
+
+    static void hide(Player player, Player watcher) {
+        for (Pet pet : pets.get(player.getUniqueId())) {
+            pet.getEntity().removeViewer(watcher.getUniqueId());
         }
     }
 
