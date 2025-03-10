@@ -1,6 +1,6 @@
 package dev.lrxh.petsAPI;
 
-import io.github.retrooper.packetevents.util.SpigotConversionUtil;import org.bukkit.Bukkit;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
