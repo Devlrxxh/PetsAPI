@@ -16,9 +16,9 @@ import java.util.UUID;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
+    static HashMap<String, SkinData> skinDatas;
     private static HashMap<UUID, List<Pet>> pets;
     private static HashMap<UUID, List<MoveRunnable>> runnables;
-    static HashMap<String, SkinData> skinDatas;
 
     public static void init(JavaPlugin plugin) {
         PacketEvents.getAPI().init();

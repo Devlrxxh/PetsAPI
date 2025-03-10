@@ -35,7 +35,7 @@ import java.util.UUID;
 public class Pet {
     private final SkinData skinData;
     private final List<PacketWrapper> packets;
-    private WrapperEntity armourStand;
+    private WrapperEntity armorStand;
     private Vector offset;
     private Player player;
     private float yaw;
@@ -74,36 +74,18 @@ public class Pet {
             armorStandMeta.setSmall(true);
         }
 
-        armourStand = new WrapperEntity(id, uuid, EntityTypes.ARMOR_STAND, armorStandMeta);
+        armorStand = new WrapperEntity(id, uuid, EntityTypes.ARMOR_STAND, armorStandMeta);
 
         Location location = player.getLocation().clone();
         location.add(offset);
 
-        if (lookAtPlayer) {
-            Vector direction = location.subtract(offset).toVector().subtract(location.toVector());
-
-            float yaw = (float) Math.toDegrees(Math.atan2(direction.getZ(), direction.getX())) - 90;
-            float pitch = (float) -Math.toDegrees(Math.asin(direction.getY() / direction.length()));
-
-            setYaw(yaw);
-            setPitch(pitch);
-        }
-
-        if (yaw != Float.MAX_VALUE) {
-            location.setYaw(yaw);
-        }
-
-        if (pitch != Float.MAX_VALUE) {
-            location.setPitch(pitch);
-        }
-
-        armourStand.spawn(SpigotConversionUtil.fromBukkitLocation(location));
+        armorStand.spawn(SpigotConversionUtil.fromBukkitLocation(location));
 
         List<Equipment> equipment = new ArrayList<>();
 
         equipment.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(getPlayerHead(skinData))));
 
-        WrapperPlayServerEntityEquipment equip = new WrapperPlayServerEntityEquipment(armourStand.getEntityId(), equipment);
+        WrapperPlayServerEntityEquipment equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
 
         packets.add(equip);
 
@@ -145,7 +127,7 @@ public class Pet {
     }
 
     public WrapperEntity getEntity() {
-        return armourStand;
+        return armorStand;
     }
 
     public Vector getOffset() {
