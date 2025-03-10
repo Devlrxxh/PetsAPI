@@ -52,14 +52,7 @@ public class MoveRunnable implements Runnable {
             location.setPitch(pet.getPitch());
         }
 
-        WrapperPlayServerEntityTeleport teleport = new WrapperPlayServerEntityTeleport(
-                pet.getEntity().getEntityId(),
-                SpigotConversionUtil.fromBukkitLocation(location),
-                true);
 
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (!online.canSee(player)) continue;
-            PacketEvents.getAPI().getPlayerManager().sendPacket(online, teleport);
-        }
+        pet.getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));
     }
 }
