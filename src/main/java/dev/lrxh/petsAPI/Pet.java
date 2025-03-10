@@ -103,7 +103,7 @@ public class Pet {
             PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
             playerProfile.setProperty(new ProfileProperty("textures",
                     skinData.getValue(),
-                    skinData.getSignature()
+                    null
             ));
             skullMeta.setPlayerProfile(playerProfile);
             head.setItemMeta(skullMeta);

@@ -27,6 +27,6 @@ public enum AnimalSkinData {
     }
 
     public SkinData getSkinData() {
-        return new SkinData(value, null);
+        return new SkinData(value);
     }
 }

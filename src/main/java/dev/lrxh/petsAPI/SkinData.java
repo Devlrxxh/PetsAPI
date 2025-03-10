@@ -23,11 +23,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class SkinData {
     private final String value;
-    private final String signature;
 
-    public SkinData(String value, String signature) {
+    public SkinData(String value) {
         this.value = value;
-        this.signature = signature;
     }
 
     public static SkinData ofPlayerName(String name) {
@@ -47,7 +45,7 @@ public class SkinData {
             String value = valueFuture.join();
             if (value.isEmpty()) return AnimalSkinData.STEVE.getSkinData();
 
-            SkinData skinData = new SkinData(value, null);
+            SkinData skinData = new SkinData(value);
 
             PetsAPI.skinDatas.put(name, skinData);
 
@@ -58,14 +56,14 @@ public class SkinData {
             PlayerProfile profile = player.getPlayerProfile();
 
             Optional<ProfileProperty> property = profile.getProperties().stream().filter(loopProperty -> loopProperty.getName().equals("textures")).findFirst();
-            return property.map(signedProperty -> new SkinData(signedProperty.getValue(), signedProperty.getSignature())).orElse(null);
+            return property.map(signedProperty -> new SkinData(signedProperty.getValue())).orElse(null);
         } else {
 
             EntityPlayer ep = ((CraftPlayer) player).getHandle();
             GameProfile gameProfile = ep.getProfile();
 
             return gameProfile.getProperties().get("textures").stream()
-                    .map(signedProperty -> new SkinData(signedProperty.getValue(), signedProperty.getSignature()))
+                    .map(signedProperty -> new SkinData(signedProperty.getValue()))
                     .findFirst()
                     .orElse(AnimalSkinData.STEVE.getSkinData());
         }
@@ -140,9 +138,5 @@ public class SkinData {
 
     public String getValue() {
         return value;
-    }
-
-    public String getSignature() {
-        return signature;
     }
 }
