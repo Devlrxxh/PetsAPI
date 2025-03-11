@@ -89,7 +89,11 @@ public class Pet {
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
                 armorStandMeta.setIndex((byte) 2, EntityDataTypes.STRING, customName);
             } else {
-                armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(component));
+                if (component != null) {
+                    armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(component));
+                } else {
+                    armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(Component.text(customName)));
+                }
             }
 
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
@@ -208,12 +212,12 @@ public class Pet {
         return player;
     }
 
-    public void setFloatingAnimation(boolean value) {
-        this.floatingAnimation = value;
-    }
-
     public boolean isFloatingAnimation() {
         return floatingAnimation;
+    }
+
+    public void setFloatingAnimation(boolean value) {
+        this.floatingAnimation = value;
     }
 
     protected List<PacketWrapper> getPackets() {
