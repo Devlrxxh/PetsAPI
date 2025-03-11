@@ -7,9 +7,6 @@ import org.bukkit.util.Vector;
 
 public class MoveRunnable implements Runnable {
     protected final Pet pet;
-    private double angle = 0;
-    private final double radius = 2.0;
-    private final double speed = 0.05;
 
     public MoveRunnable(Pet pet) {
         this.pet = pet;
@@ -42,11 +39,6 @@ public class MoveRunnable implements Runnable {
             pet.setPitch(pitch);
         }
 
-        angle += speed;
-        double offsetX = radius * Math.cos(angle);
-        double offsetZ = radius * Math.sin(angle);
-
-        location.add(offsetX, 0, offsetZ);
         location.add(pet.getOffset());
 
         if (pet.getYaw() != Float.MAX_VALUE) {

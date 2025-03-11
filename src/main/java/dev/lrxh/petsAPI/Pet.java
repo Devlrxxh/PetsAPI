@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Pet {
@@ -44,6 +45,7 @@ public class Pet {
     private float pitch;
     private boolean lookAtPlayer;
     private String customName;
+    private Component component;
 
     public Pet(SkinData skinData) {
         this.skinData = skinData;
@@ -53,6 +55,7 @@ public class Pet {
         this.pitch = Float.MAX_VALUE;
         this.lookAtPlayer = false;
         this.customName = "";
+        this.component = null;
     }
 
     public Pet(AnimalSkinData animalSkinData) {
@@ -79,17 +82,17 @@ public class Pet {
             armorStandMeta.setSmall(true);
         }
 
-        if (!customName.isEmpty()) {
+        if (!customName.isEmpty() || component != null) {
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
                 armorStandMeta.setIndex((byte) 2, EntityDataTypes.STRING, customName);
             } else {
-                armorStandMeta.setCustomName(Component.text(customName));
+                armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(component));
             }
 
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
                 armorStandMeta.setMaskBit(3, (byte) 1, true);
             } else {
-                armorStandMeta.setCustomNameVisible(true);
+                armorStandMeta.setIndex((byte) 3, EntityDataTypes.BOOLEAN, true);
             }
         }
 
@@ -186,12 +189,16 @@ public class Pet {
         this.lookAtPlayer = lookAtPlayer;
     }
 
+    public String getCustomName() {
+        return customName;
+    }
+
     public void setCustomName(String customName) {
         this.customName = customName;
     }
 
-    public String getCustomName() {
-        return customName;
+    public void setComponent(Component component) {
+        this.component = component;
     }
 
     public Player getPlayer() {
