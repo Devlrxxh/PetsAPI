@@ -49,7 +49,6 @@ public class MoveRunnable implements Runnable {
             location.setPitch(pet.getPitch());
         }
 
-
         pet.getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));
     }
 }

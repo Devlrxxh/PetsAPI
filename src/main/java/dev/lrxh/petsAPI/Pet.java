@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
@@ -17,6 +18,7 @@ import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.meta.Metadata;
 import me.tofaa.entitylib.meta.other.ArmorStandMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,6 +43,7 @@ public class Pet {
     private float yaw;
     private float pitch;
     private boolean lookAtPlayer;
+    private String customName;
 
     public Pet(SkinData skinData) {
         this.skinData = skinData;
@@ -49,6 +52,7 @@ public class Pet {
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
         this.lookAtPlayer = false;
+        this.customName = "";
     }
 
     public Pet(AnimalSkinData animalSkinData) {
@@ -58,6 +62,7 @@ public class Pet {
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
         this.lookAtPlayer = false;
+        this.customName = "";
     }
 
     public void spawn(Player player) {
@@ -72,6 +77,20 @@ public class Pet {
             armorStandMeta.setMaskBit(10, (byte) 1, true);
         } else {
             armorStandMeta.setSmall(true);
+        }
+
+        if (!customName.isEmpty()) {
+            if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
+                armorStandMeta.setIndex((byte) 2, EntityDataTypes.STRING, customName);
+            } else {
+                armorStandMeta.setCustomName(Component.text(customName));
+            }
+
+            if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
+                armorStandMeta.setMaskBit(3, (byte) 1, true);
+            } else {
+                armorStandMeta.setCustomNameVisible(true);
+            }
         }
 
         armorStand = new WrapperEntity(id, uuid, EntityTypes.ARMOR_STAND, armorStandMeta);
@@ -166,6 +185,14 @@ public class Pet {
 
     public void setLookAtPlayer(boolean lookAtPlayer) {
         this.lookAtPlayer = lookAtPlayer;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
+    }
+
+    public String getCustomName() {
+        return customName;
     }
 
     protected List<PacketWrapper> getPackets() {
