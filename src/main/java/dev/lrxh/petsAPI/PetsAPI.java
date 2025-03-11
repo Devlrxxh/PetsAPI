@@ -36,7 +36,7 @@ public final class PetsAPI {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (List<MoveRunnable> runnable : runnables.values()) {
                 for (MoveRunnable moveRunnable : runnable) {
-                    Bukkit.getScheduler().runTask(plugin, moveRunnable);
+                    moveRunnable.tick();
                 }
             }
         }, 0L, 1L);

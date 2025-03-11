@@ -5,18 +5,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-public class MoveRunnable implements Runnable {
+public class MoveRunnable {
     protected final Pet pet;
-    private static final double FLOATING_AMPLITUDE = 0.1;
-    private static final double FLOATING_SPEED = 0.05;
     private double floatingOffset = 0;
 
     public MoveRunnable(Pet pet) {
         this.pet = pet;
     }
 
-    @Override
-    public void run() {
+    public void tick() {
         Player player = pet.getPlayer();
 
         if (player == null) {
@@ -53,6 +50,9 @@ public class MoveRunnable implements Runnable {
         }
 
         if (pet.isFloatingAnimation()) {
+            double FLOATING_SPEED = 0.05;
+            double FLOATING_AMPLITUDE = 0.1;
+
             floatingOffset += FLOATING_SPEED;
             location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
         }
