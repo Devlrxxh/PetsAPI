@@ -30,10 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class Pet {
     private final SkinData skinData;
@@ -89,11 +86,7 @@ public class Pet {
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
                 armorStandMeta.setIndex((byte) 2, EntityDataTypes.STRING, customName);
             } else {
-                if (component != null) {
-                    armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(component));
-                } else {
-                    armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(Component.text(customName)));
-                }
+                armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(Objects.requireNonNullElseGet(component, () -> Component.text(customName))));
             }
 
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
