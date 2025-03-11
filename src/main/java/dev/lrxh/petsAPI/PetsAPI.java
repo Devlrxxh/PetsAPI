@@ -16,9 +16,9 @@ import java.util.UUID;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
-    static HashMap<String, SkinData> skinDatas;
+    static HashMap<String, SkinData> skinData;
     private static HashMap<UUID, List<Pet>> pets;
-    private static HashMap<UUID, List<MoveRunnable>> runnables;
+    private static HashMap<UUID, List<MoveRunnable>> runnable;
 
     public static void init(JavaPlugin plugin) {
         PacketEvents.getAPI().init();
@@ -28,13 +28,13 @@ public final class PetsAPI {
                 new APIConfig(PacketEvents.getAPI()));
         instance = plugin;
         pets = new HashMap<>();
-        runnables = new HashMap<>();
-        skinDatas = new HashMap<>();
+        runnable = new HashMap<>();
+        skinData = new HashMap<>();
 
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (List<MoveRunnable> runnable : runnables.values()) {
+            for (List<MoveRunnable> runnable : runnable.values()) {
                 for (MoveRunnable moveRunnable : runnable) {
                     moveRunnable.tick();
                 }
@@ -51,12 +51,12 @@ public final class PetsAPI {
             pets.get(player.getUniqueId()).add(pet);
         }
 
-        if (!runnables.containsKey(player.getUniqueId())) {
+        if (!runnable.containsKey(player.getUniqueId())) {
             List<MoveRunnable> runnables = new ArrayList<>();
             runnables.add(new MoveRunnable(pet));
-            PetsAPI.runnables.put(player.getUniqueId(), runnables);
+            PetsAPI.runnable.put(player.getUniqueId(), runnables);
         } else {
-            runnables.get(player.getUniqueId()).add(new MoveRunnable(pet));
+            runnable.get(player.getUniqueId()).add(new MoveRunnable(pet));
         }
 
         for (Player online : Bukkit.getOnlinePlayers()) {
@@ -100,7 +100,7 @@ public final class PetsAPI {
         }
 
         pets.remove(player.getUniqueId());
-        runnables.remove(player.getUniqueId());
+        runnable.remove(player.getUniqueId());
     }
 
     static void kill(Pet pet) {
@@ -110,8 +110,8 @@ public final class PetsAPI {
             pets.get(uuid).remove(pet);
         }
 
-        for (UUID uuid : new ArrayList<>(runnables.keySet())) {
-            runnables.get(uuid).removeIf(moveRunnable -> moveRunnable.pet.equals(pet));
+        for (UUID uuid : new ArrayList<>(runnable.keySet())) {
+            runnable.get(uuid).removeIf(moveRunnable -> moveRunnable.pet.equals(pet));
         }
     }
 

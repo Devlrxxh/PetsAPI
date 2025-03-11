@@ -6,19 +6,26 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.manager.server.VersionComparison;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class SkinData {
@@ -32,8 +39,8 @@ public class SkinData {
         Player player = Bukkit.getPlayerExact(name);
 
         if (player == null) {
-            if (PetsAPI.skinDatas.containsKey(name)) {
-                return PetsAPI.skinDatas.get(name);
+            if (PetsAPI.skinData.containsKey(name)) {
+                return PetsAPI.skinData.get(name);
             }
 
             CompletableFuture<String> uuidFuture = getPlayerUUID(name);
@@ -47,7 +54,7 @@ public class SkinData {
 
             SkinData skinData = new SkinData(value);
 
-            PetsAPI.skinDatas.put(name, skinData);
+            PetsAPI.skinData.put(name, skinData);
 
             return skinData;
         }
@@ -66,6 +73,36 @@ public class SkinData {
                     .map(signedProperty -> new SkinData(signedProperty.getValue()))
                     .findFirst()
                     .orElse(AnimalSkinData.STEVE.getSkinData());
+        }
+    }
+
+    public ItemStack getPlayerHead() {
+        if (PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+            SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
+            PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
+            playerProfile.setProperty(new ProfileProperty("textures",
+                    value,
+                    null
+            ));
+            skullMeta.setPlayerProfile(playerProfile);
+            head.setItemMeta(skullMeta);
+            return head;
+        } else {
+            ItemStack head = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+            SkullMeta meta = (SkullMeta) head.getItemMeta();
+            GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+            profile.getProperties().put("textures", new Property("textures", value));
+            Field profileField;
+            try {
+                profileField = meta.getClass().getDeclaredField("profile");
+                profileField.setAccessible(true);
+                profileField.set(meta, profile);
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+                PetsAPI.instance.getLogger().severe(e.getMessage());
+            }
+            head.setItemMeta(meta);
+            return head;
         }
     }
 

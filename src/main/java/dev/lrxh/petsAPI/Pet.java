@@ -105,7 +105,7 @@ public class Pet {
 
         List<Equipment> equipment = new ArrayList<>();
 
-        equipment.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(getPlayerHead(skinData))));
+        equipment.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(skinData.getPlayerHead())));
 
         WrapperPlayServerEntityEquipment equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
 
@@ -116,36 +116,6 @@ public class Pet {
 
     public void remove() {
         PetsAPI.kill(this);
-    }
-
-    public ItemStack getPlayerHead(@NotNull SkinData skinData) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
-            ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
-            SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
-            PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
-            playerProfile.setProperty(new ProfileProperty("textures",
-                    skinData.getValue(),
-                    null
-            ));
-            skullMeta.setPlayerProfile(playerProfile);
-            head.setItemMeta(skullMeta);
-            return head;
-        } else {
-            ItemStack head = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
-            SkullMeta meta = (SkullMeta) head.getItemMeta();
-            GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-            profile.getProperties().put("textures", new Property("textures", skinData.getValue()));
-            Field profileField;
-            try {
-                profileField = meta.getClass().getDeclaredField("profile");
-                profileField.setAccessible(true);
-                profileField.set(meta, profile);
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-                PetsAPI.instance.getLogger().severe(e.getMessage());
-            }
-            head.setItemMeta(meta);
-            return head;
-        }
     }
 
     public WrapperEntity getEntity() {
