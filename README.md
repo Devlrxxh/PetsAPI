@@ -17,14 +17,16 @@ Player player = ...
 Pet pet = new Pet(SkinData.ofPlayerName(player.getName()));
 pet.spawn(player);
 
-//Example Animal Head
+// Example Animal Head
 Player player = ...
 Pet pet = new Pet(AnimalSkinData.COW);
 pet.setLookAtPlayer(true);
 pet.spawn(player);
 
-//Remove player pets
+// Remove player pets
 for (Pet pet : PetsAPI.getPets(player)) {
     pet.remove();
 }
+
+pet. // See all methods
 ``` 
