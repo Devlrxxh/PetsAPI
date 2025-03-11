@@ -39,7 +39,7 @@ public final class PetsAPI {
                     Bukkit.getScheduler().runTask(plugin, moveRunnable);
                 }
             }
-        }, 0L, 2L);
+        }, 0L, 1L);
     }
 
     static void add(Player player, Pet pet) {
@@ -53,10 +53,10 @@ public final class PetsAPI {
 
         if (!runnables.containsKey(player.getUniqueId())) {
             List<MoveRunnable> runnables = new ArrayList<>();
-            runnables.add(new MoveRunnable(player, pet));
+            runnables.add(new MoveRunnable(pet));
             PetsAPI.runnables.put(player.getUniqueId(), runnables);
         } else {
-            runnables.get(player.getUniqueId()).add(new MoveRunnable(player, pet));
+            runnables.get(player.getUniqueId()).add(new MoveRunnable(pet));
         }
 
         for (Player online : Bukkit.getOnlinePlayers()) {
@@ -77,6 +77,7 @@ public final class PetsAPI {
     }
 
     static void load(Player player, Player watcher) {
+        if (!pets.containsKey(player.getUniqueId())) return;
         for (Pet pet : pets.get(player.getUniqueId())) {
             pet.getEntity().addViewer(player.getUniqueId());
             for (PacketWrapper packet : pet.getPackets()) {
@@ -86,12 +87,14 @@ public final class PetsAPI {
     }
 
     static void hide(Player player, Player watcher) {
+        if (!pets.containsKey(player.getUniqueId())) return;
         for (Pet pet : pets.get(player.getUniqueId())) {
             pet.getEntity().removeViewer(watcher.getUniqueId());
         }
     }
 
     static void kill(Player player) {
+        if (!pets.containsKey(player.getUniqueId())) return;
         for (Pet pet : pets.get(player.getUniqueId())) {
             pet.getEntity().despawn();
         }

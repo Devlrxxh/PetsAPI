@@ -159,8 +159,7 @@ public class Pet {
 
     @Nullable
     public Location getLocation() {
-        if (player == null) return null;
-        return player.getLocation().add(offset);
+        return SpigotConversionUtil.toBukkitLocation(player.getWorld(), armorStand.getLocation());
     }
 
     public float getYaw() {
@@ -193,6 +192,10 @@ public class Pet {
 
     public String getCustomName() {
         return customName;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     protected List<PacketWrapper> getPackets() {
