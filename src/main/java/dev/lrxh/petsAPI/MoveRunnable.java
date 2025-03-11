@@ -7,6 +7,9 @@ import org.bukkit.util.Vector;
 
 public class MoveRunnable implements Runnable {
     protected final Pet pet;
+    private static final double FLOATING_AMPLITUDE = 0.1;
+    private static final double FLOATING_SPEED = 0.05;
+    private double floatingOffset = 0;
 
     public MoveRunnable(Pet pet) {
         this.pet = pet;
@@ -47,6 +50,11 @@ public class MoveRunnable implements Runnable {
 
         if (pet.getPitch() != Float.MAX_VALUE) {
             location.setPitch(pet.getPitch());
+        }
+
+        if (pet.isFloatingAnimation()) {
+            floatingOffset += FLOATING_SPEED;
+            location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
         }
 
         pet.getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));

@@ -46,6 +46,7 @@ public class Pet {
     private boolean lookAtPlayer;
     private String customName;
     private Component component;
+    private boolean floatingAnimation;
 
     public Pet(SkinData skinData) {
         this.skinData = skinData;
@@ -56,6 +57,7 @@ public class Pet {
         this.lookAtPlayer = false;
         this.customName = "";
         this.component = null;
+        this.floatingAnimation = false;
     }
 
     public Pet(AnimalSkinData animalSkinData) {
@@ -66,6 +68,7 @@ public class Pet {
         this.pitch = Float.MAX_VALUE;
         this.lookAtPlayer = false;
         this.customName = "";
+        this.floatingAnimation = false;
     }
 
     public void spawn(Player player) {
@@ -203,6 +206,14 @@ public class Pet {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public void setFloatingAnimation(boolean value) {
+        this.floatingAnimation = value;
+    }
+
+    public boolean isFloatingAnimation() {
+        return floatingAnimation;
     }
 
     protected List<PacketWrapper> getPackets() {
