@@ -9,10 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
@@ -43,23 +40,25 @@ public final class PetsAPI {
             }
         }, 0L, 1L);
     }
-    
-    
+
+
     // Hides all player pets from player
     public static void addIgnoredPlayer(Player player) {
         ignorePlayers.add(player.getUniqueId());
-        
-        for (Player online : Bukkit.getOnlinePlayers()) {
+
+        for (UUID uuid : new ArrayList<>(pets.keySet())) {
+            Player online = Bukkit.getPlayer(uuid);
+            if (online == null) continue;;
             hide(online, player);
         }
     }
 
     public static void removeIgnoredPlayer(Player player) {
         ignorePlayers.remove(player.getUniqueId());
-        
+
         load(player);
     }
-    
+
     static void add(Player player, Pet pet) {
         if (!pets.containsKey(player.getUniqueId())) {
             List<Pet> pets = new ArrayList<>();
@@ -88,6 +87,7 @@ public final class PetsAPI {
         for (List<Pet> pets : pets.values()) {
             for (Pet pet : pets) {
                 pet.getEntity().addViewer(player.getUniqueId());
+                instance.getLogger().info("Loading pet for " + player.getName());
                 for (PacketWrapper packet : pet.getPackets()) {
                     PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
                 }
@@ -114,12 +114,20 @@ public final class PetsAPI {
 
     static void kill(Player player) {
         if (!pets.containsKey(player.getUniqueId())) return;
+
+        for (List<Pet> pets : pets.values()) {
+            for (Pet pet : pets) {
+                pet.getEntity().removeViewer(player.getUniqueId());
+            }
+        }
+
         for (Pet pet : pets.get(player.getUniqueId())) {
             pet.getEntity().despawn();
         }
 
         pets.remove(player.getUniqueId());
         runnable.remove(player.getUniqueId());
+        ignorePlayers.remove(player.getUniqueId());
     }
 
     static void kill(Pet pet) {

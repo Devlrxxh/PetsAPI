@@ -1,6 +1,7 @@
 package dev.lrxh.petsAPI;
 
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -55,6 +56,16 @@ public class MoveRunnable {
 
             floatingOffset += FLOATING_SPEED;
             location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
+        }
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (!online.canSee(player)) PetsAPI.hide(player, online);
+        }
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.canSee(player) && !pet.getEntity().getViewers().contains(online.getUniqueId())){
+                PetsAPI.load(player, online);
+            }
         }
 
         pet.getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));
