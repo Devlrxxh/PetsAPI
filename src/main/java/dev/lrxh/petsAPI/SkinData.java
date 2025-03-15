@@ -14,7 +14,6 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -73,36 +72,6 @@ public class SkinData {
                     .map(signedProperty -> new SkinData(signedProperty.getValue()))
                     .findFirst()
                     .orElse(AnimalSkinData.STEVE.getSkinData());
-        }
-    }
-
-    public ItemStack getPlayerHead() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
-            ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
-            SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
-            PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
-            playerProfile.setProperty(new ProfileProperty("textures",
-                    value,
-                    null
-            ));
-            skullMeta.setPlayerProfile(playerProfile);
-            head.setItemMeta(skullMeta);
-            return head;
-        } else {
-            ItemStack head = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
-            SkullMeta meta = (SkullMeta) head.getItemMeta();
-            GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-            profile.getProperties().put("textures", new Property("textures", value));
-            Field profileField;
-            try {
-                profileField = meta.getClass().getDeclaredField("profile");
-                profileField.setAccessible(true);
-                profileField.set(meta, profile);
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-                PetsAPI.instance.getLogger().severe(e.getMessage());
-            }
-            head.setItemMeta(meta);
-            return head;
         }
     }
 
@@ -171,6 +140,36 @@ public class SkinData {
                 return "";
             }
         });
+    }
+
+    public ItemStack getPlayerHead() {
+        if (PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+            SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
+            PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
+            playerProfile.setProperty(new ProfileProperty("textures",
+                    value,
+                    null
+            ));
+            skullMeta.setPlayerProfile(playerProfile);
+            head.setItemMeta(skullMeta);
+            return head;
+        } else {
+            ItemStack head = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+            SkullMeta meta = (SkullMeta) head.getItemMeta();
+            GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+            profile.getProperties().put("textures", new Property("textures", value));
+            Field profileField;
+            try {
+                profileField = meta.getClass().getDeclaredField("profile");
+                profileField.setAccessible(true);
+                profileField.set(meta, profile);
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+                PetsAPI.instance.getLogger().severe(e.getMessage());
+            }
+            head.setItemMeta(meta);
+            return head;
+        }
     }
 
     public String getValue() {

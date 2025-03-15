@@ -19,6 +19,7 @@ public final class PetsAPI {
     static HashMap<String, SkinData> skinData;
     private static HashMap<UUID, List<Pet>> pets;
     private static HashMap<UUID, List<MoveRunnable>> runnable;
+    private static List<UUID> ignorePlayers;
 
     public static void init(JavaPlugin plugin) {
         PacketEvents.getAPI().init();
@@ -30,6 +31,7 @@ public final class PetsAPI {
         pets = new HashMap<>();
         runnable = new HashMap<>();
         skinData = new HashMap<>();
+        ignorePlayers = new ArrayList<>();
 
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
@@ -41,7 +43,23 @@ public final class PetsAPI {
             }
         }, 0L, 1L);
     }
+    
+    
+    // Hides all player pets from player
+    public static void addIgnoredPlayer(Player player) {
+        ignorePlayers.add(player.getUniqueId());
+        
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            hide(online, player);
+        }
+    }
 
+    public static void removeIgnoredPlayer(Player player) {
+        ignorePlayers.remove(player.getUniqueId());
+        
+        load(player);
+    }
+    
     static void add(Player player, Pet pet) {
         if (!pets.containsKey(player.getUniqueId())) {
             List<Pet> pets = new ArrayList<>();
@@ -61,6 +79,7 @@ public final class PetsAPI {
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (!online.canSee(player)) continue;
+            if (ignorePlayers.contains(online.getUniqueId())) continue;;
             load(online);
         }
     }
