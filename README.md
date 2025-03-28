@@ -1,9 +1,8 @@
-# PetsAPI
-<div align="center">
-</div>
-
 # Introduction
 Fully packet based PetsAPI (1.8 - 1.21) using [PacketEvents](https://github.com/retrooper/packetevents/) and [EntityLib](https://github.com/Tofaa2/EntityLib) 
+
+> [!IMPORTANT]
+> Project version is required to be Java 16 at least!
 
 # Setup
 1. Clone repo
