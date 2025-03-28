@@ -1,7 +1,6 @@
 package dev.lrxh.petsAPI;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform;
@@ -10,7 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
@@ -76,15 +78,14 @@ public final class PetsAPI {
 
     static void load(Player player, Pet pet) {
         pet.getEntity().addViewer(player.getUniqueId());
-        for (PacketWrapper packet : pet.getPackets()) {
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
-        }
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, pet.getEquip());
     }
 
     static void kill(Player player) {
         if (!pets.containsKey(player.getUniqueId())) return;
         for (Pet pet : getPets(player)) {
             pet.getEntity().despawn();
+            pet.getEntity().remove();
             pets.remove(player.getUniqueId());
         }
     }

@@ -7,7 +7,6 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.EntityLib;
@@ -20,11 +19,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class Pet {
     private final SkinData skinData;
-    private final List<PacketWrapper> packets;
+    private WrapperPlayServerEntityEquipment equip;
     private WrapperEntity armorStand;
     private Vector offset;
     private Player player;
@@ -39,26 +41,21 @@ public class Pet {
     public Pet(SkinData skinData) {
         this.skinData = skinData;
         this.offset = new Vector(1, 1, 1);
-        this.packets = new ArrayList<>();
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
         this.lookAtPlayer = false;
         this.customName = "";
-        this.component = null;
         this.floatingAnimation = false;
-        this.moveRunnable = null;
     }
 
     public Pet(AnimalSkinData animalSkinData) {
         this.skinData = animalSkinData.getSkinData();
         this.offset = new Vector(1, 1, 1);
-        this.packets = new ArrayList<>();
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
         this.lookAtPlayer = false;
         this.customName = "";
         this.floatingAnimation = false;
-        this.moveRunnable = null;
     }
 
     public void spawn(Player player) {
@@ -105,9 +102,7 @@ public class Pet {
 
         equipment.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(skinData.getPlayerHead())));
 
-        WrapperPlayServerEntityEquipment equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
-
-        packets.add(equip);
+        equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
 
         moveRunnable = new MoveRunnable(this);
 
@@ -183,8 +178,8 @@ public class Pet {
         this.floatingAnimation = value;
     }
 
-    protected List<PacketWrapper> getPackets() {
-        return packets;
+    protected WrapperPlayServerEntityEquipment getEquip() {
+        return equip;
     }
 
     protected MoveRunnable getMoveRunnable() {
