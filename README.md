@@ -14,12 +14,12 @@ Fully packet based PetsAPI (1.8 - 1.21) using [PacketEvents](https://github.com/
 PetsAPI.init(this)
 
 Player player = ...
-Pet pet = new Pet(SkinData.ofPlayerName(player.getName()));
+PlayerPet pet = new PlayerPet(SkinData.ofPlayerName(player.getName()));
 pet.spawn(player);
 
 // Example Animal Head
 Player player = ...
-Pet pet = new Pet(AnimalSkinData.COW);
+PlayerPet pet = new PlayerPet(AnimalSkinData.COW);
 pet.setLookAtPlayer(true);
 pet.spawn(player);
 
