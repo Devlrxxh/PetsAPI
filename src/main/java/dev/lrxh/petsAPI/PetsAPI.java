@@ -9,15 +9,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
     static HashMap<String, SkinData> skinData;
-    private static HashMap<UUID, List<Pet>> pets;
+    private static HashMap<UUID, List<PlayerPet>> playerPets;
+    private static Set<Pet> pets;
     private static List<UUID> ignorePlayers;
 
     public static void init(JavaPlugin plugin) {
@@ -27,8 +25,9 @@ public final class PetsAPI {
                 new SpigotEntityLibPlatform(plugin),
                 new APIConfig(PacketEvents.getAPI()));
         instance = plugin;
-        pets = new HashMap<>();
+        playerPets = new HashMap<>();
         skinData = new HashMap<>();
+        pets = new HashSet<>();
         ignorePlayers = new ArrayList<>();
 
         ViewerEngine viewerEngine = new ViewerEngine();
@@ -38,10 +37,9 @@ public final class PetsAPI {
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (List<Pet> pets : pets.values()) {
+            for (List<PlayerPet> pets : playerPets.values()) {
                 for (Pet pet : pets) {
-                    MoveRunnable moveRunnable = pet.getMoveRunnable();
-                    moveRunnable.tick();
+                    pet.tick();
                 }
             }
         }, 0L, 2L);
@@ -56,23 +54,35 @@ public final class PetsAPI {
         ignorePlayers.remove(player.getUniqueId());
     }
 
-    static void add(Player player, Pet pet) {
-        if (pets.containsKey(player.getUniqueId())) {
-            pets.get(player.getUniqueId()).add(pet);
+    static void add(Pet pet) {
+        pets.add(pet);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            load(player, pet);
+        }
+    }
+
+    static void add(Player player, PlayerPet pet) {
+        if (playerPets.containsKey(player.getUniqueId())) {
+            playerPets.get(player.getUniqueId()).add(pet);
         } else {
-            ArrayList<Pet> list = new ArrayList<>();
+            ArrayList<PlayerPet> list = new ArrayList<>();
             list.add(pet);
-            pets.put(player.getUniqueId(), list);
+            playerPets.put(player.getUniqueId(), list);
         }
 
         load(player, pet);
     }
 
     static void load(Player player) {
-        for (List<Pet> pets : pets.values()) {
+        for (List<PlayerPet> pets : playerPets.values()) {
             for (Pet pet : pets) {
                 load(player, pet);
             }
+        }
+
+        for (Pet pet : pets) {
+            load(player, pet);
         }
     }
 
@@ -82,17 +92,23 @@ public final class PetsAPI {
     }
 
     static void kill(Player player) {
-        if (!pets.containsKey(player.getUniqueId())) return;
+        if (!playerPets.containsKey(player.getUniqueId())) return;
         for (Pet pet : getPets(player)) {
             pet.getEntity().despawn();
             pet.getEntity().remove();
-            pets.remove(player.getUniqueId());
+            playerPets.remove(player.getUniqueId());
         }
     }
 
-    public static List<Pet> getPets(Player player) {
-        if (!pets.containsKey(player.getUniqueId())) return new ArrayList<>();
+    static void kill(Pet pet) {
+        pet.getEntity().despawn();
+        pet.getEntity().remove();
+        pets.remove(pet);
+    }
 
-        return new ArrayList<>(pets.get(player.getUniqueId()));
+    public static List<Pet> getPets(Player player) {
+        if (!playerPets.containsKey(player.getUniqueId())) return new ArrayList<>();
+
+        return new ArrayList<>(playerPets.get(player.getUniqueId()));
     }
 }

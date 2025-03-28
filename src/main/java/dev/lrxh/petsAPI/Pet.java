@@ -15,37 +15,33 @@ import me.tofaa.entitylib.meta.other.ArmorStandMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class Pet {
     private final SkinData skinData;
+    protected double floatingOffset;
     private WrapperPlayServerEntityEquipment equip;
     private WrapperEntity armorStand;
     private Vector offset;
-    private Player player;
     private float yaw;
     private float pitch;
-    private boolean lookAtPlayer;
     private String customName;
     private Component component;
     private boolean floatingAnimation;
-    private MoveRunnable moveRunnable;
+    private World world;
 
     public Pet(SkinData skinData) {
         this.skinData = skinData;
         this.offset = new Vector(1, 1, 1);
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
-        this.lookAtPlayer = false;
         this.customName = "";
         this.floatingAnimation = false;
+        this.world = null;
+        this.floatingOffset = 0;
     }
 
     public Pet(AnimalSkinData animalSkinData) {
@@ -53,13 +49,14 @@ public class Pet {
         this.offset = new Vector(1, 1, 1);
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
-        this.lookAtPlayer = false;
         this.customName = "";
         this.floatingAnimation = false;
+        this.world = null;
+        this.floatingOffset = 0;
     }
 
-    public void spawn(Player player) {
-        this.player = player;
+    public void spawn(Location location) {
+        this.world = location.getWorld();
         UUID uuid = UUID.randomUUID();
         int id = EntityLib.getPlatform().getEntityIdProvider().provide(uuid, EntityTypes.ARMOR_STAND);
 
@@ -77,11 +74,7 @@ public class Pet {
                 armorStandMeta.setIndex((byte) 2, EntityDataTypes.STRING, customName);
             } else {
                 Optional<Component> optionalComponent;
-                if (component != null) {
-                    optionalComponent = Optional.of(component);
-                } else {
-                    optionalComponent = Optional.of(Component.text(customName));
-                }
+                optionalComponent = Optional.of(Objects.requireNonNullElseGet(component, () -> Component.text(customName)));
                 armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, optionalComponent);
             }
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
@@ -93,7 +86,6 @@ public class Pet {
 
         armorStand = new WrapperEntity(id, uuid, EntityTypes.ARMOR_STAND, armorStandMeta);
 
-        Location location = player.getLocation().clone();
         location.add(offset);
 
         armorStand.spawn(SpigotConversionUtil.fromBukkitLocation(location));
@@ -104,13 +96,11 @@ public class Pet {
 
         equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
 
-        moveRunnable = new MoveRunnable(this);
-
-        PetsAPI.add(player, this);
+        PetsAPI.add(this);
     }
 
     public void remove() {
-        PetsAPI.kill(player);
+        PetsAPI.kill(this);
     }
 
     public WrapperEntity getEntity() {
@@ -125,9 +115,8 @@ public class Pet {
         this.offset = offset;
     }
 
-    @Nullable
     public Location getLocation() {
-        return SpigotConversionUtil.toBukkitLocation(player.getWorld(), armorStand.getLocation());
+        return SpigotConversionUtil.toBukkitLocation(world, armorStand.getLocation());
     }
 
     public float getYaw() {
@@ -146,14 +135,6 @@ public class Pet {
         this.pitch = pitch;
     }
 
-    public boolean isLookAtPlayer() {
-        return lookAtPlayer;
-    }
-
-    public void setLookAtPlayer(boolean lookAtPlayer) {
-        this.lookAtPlayer = lookAtPlayer;
-    }
-
     public String getCustomName() {
         return customName;
     }
@@ -164,10 +145,6 @@ public class Pet {
 
     public void setComponent(Component component) {
         this.component = component;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 
     public boolean isFloatingAnimation() {
@@ -182,7 +159,27 @@ public class Pet {
         return equip;
     }
 
-    protected MoveRunnable getMoveRunnable() {
-        return moveRunnable;
+    public void tick() {
+        Location location = getLocation();
+
+        location.add(getOffset());
+
+        if (getYaw() != Float.MAX_VALUE) {
+            location.setYaw(getYaw());
+        }
+
+        if (getPitch() != Float.MAX_VALUE) {
+            location.setPitch(getPitch());
+        }
+
+        if (isFloatingAnimation()) {
+            double FLOATING_SPEED = 0.05;
+            double FLOATING_AMPLITUDE = 0.1;
+
+            floatingOffset += FLOATING_SPEED;
+            location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
+        }
+
+        getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));
     }
 }
