@@ -34,6 +34,7 @@ public class Pet {
     private String customName;
     private Component component;
     private boolean floatingAnimation;
+    private MoveRunnable moveRunnable;
 
     public Pet(SkinData skinData) {
         this.skinData = skinData;
@@ -45,6 +46,7 @@ public class Pet {
         this.customName = "";
         this.component = null;
         this.floatingAnimation = false;
+        this.moveRunnable = null;
     }
 
     public Pet(AnimalSkinData animalSkinData) {
@@ -56,6 +58,7 @@ public class Pet {
         this.lookAtPlayer = false;
         this.customName = "";
         this.floatingAnimation = false;
+        this.moveRunnable = null;
     }
 
     public void spawn(Player player) {
@@ -76,9 +79,14 @@ public class Pet {
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
                 armorStandMeta.setIndex((byte) 2, EntityDataTypes.STRING, customName);
             } else {
-                armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(Objects.requireNonNullElseGet(component, () -> Component.text(customName))));
+                Optional<Component> optionalComponent;
+                if (component != null) {
+                    optionalComponent = Optional.of(component);
+                } else {
+                    optionalComponent = Optional.of(Component.text(customName));
+                }
+                armorStandMeta.setIndex((byte) 2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, optionalComponent);
             }
-
             if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
                 armorStandMeta.setMaskBit(3, (byte) 1, true);
             } else {
@@ -101,11 +109,13 @@ public class Pet {
 
         packets.add(equip);
 
+        moveRunnable = new MoveRunnable(this);
+
         PetsAPI.add(player, this);
     }
 
     public void remove() {
-        PetsAPI.kill(this);
+        PetsAPI.kill(player);
     }
 
     public WrapperEntity getEntity() {
@@ -175,5 +185,9 @@ public class Pet {
 
     protected List<PacketWrapper> getPackets() {
         return packets;
+    }
+
+    protected MoveRunnable getMoveRunnable() {
+        return moveRunnable;
     }
 }

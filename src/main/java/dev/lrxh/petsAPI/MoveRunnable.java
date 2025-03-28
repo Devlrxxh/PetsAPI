@@ -1,7 +1,6 @@
 package dev.lrxh.petsAPI;
 
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -17,19 +16,10 @@ public class MoveRunnable {
     public void tick() {
         Player player = pet.getPlayer();
 
-        if (player == null) {
-            PetsAPI.kill(pet);
-            return;
-        }
-
         Location location = player.getLocation().clone();
 
         if (pet.isLookAtPlayer()) {
             Location petLocation = pet.getLocation();
-            if (petLocation == null) {
-                PetsAPI.kill(pet);
-                return;
-            }
 
             Vector direction = location.toVector().subtract(petLocation.toVector());
 
@@ -56,16 +46,6 @@ public class MoveRunnable {
 
             floatingOffset += FLOATING_SPEED;
             location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
-        }
-
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (!online.canSee(player)) PetsAPI.hide(player, online);
-        }
-
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (online.canSee(player) && !pet.getEntity().getViewers().contains(online.getUniqueId())){
-                PetsAPI.load(player, online);
-            }
         }
 
         pet.getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));

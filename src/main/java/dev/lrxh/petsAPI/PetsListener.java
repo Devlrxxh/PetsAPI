@@ -9,10 +9,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class PetsListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(PetsAPI.instance, () -> {
-            PetsAPI.addIgnoredPlayer(event.getPlayer());
-            PetsAPI.removeIgnoredPlayer(event.getPlayer());
-        }, 10L);
+        PetsAPI.load(event.getPlayer());
     }
 
     @EventHandler
