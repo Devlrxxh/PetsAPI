@@ -37,14 +37,14 @@ public final class PetsAPI {
 
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (List<Pet> pets : pets.values()) {
                 for (Pet pet : pets) {
                     MoveRunnable moveRunnable = pet.getMoveRunnable();
                     moveRunnable.tick();
                 }
             }
-        }, 1L);
+        }, 0L, 2L);
     }
 
 
