@@ -20,7 +20,8 @@ public class PlayerPet extends Pet {
     public void spawn(Player player) {
         this.player = player;
         Location location = player.getLocation().clone();
-        spawn(location);
+        spawn(location, false);
+        PetsAPI.add(player, this);
     }
 
     public Player getPlayer() {

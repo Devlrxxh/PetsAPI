@@ -56,6 +56,10 @@ public class Pet {
     }
 
     public void spawn(Location location) {
+        spawn(location, true);
+    }
+
+    public void spawn(Location location, boolean add) {
         this.world = location.getWorld();
         UUID uuid = UUID.randomUUID();
         int id = EntityLib.getPlatform().getEntityIdProvider().provide(uuid, EntityTypes.ARMOR_STAND);
@@ -96,7 +100,7 @@ public class Pet {
 
         equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
 
-        PetsAPI.add(this);
+        if (add) PetsAPI.add(this);
     }
 
     public void remove() {

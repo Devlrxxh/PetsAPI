@@ -42,6 +42,10 @@ public final class PetsAPI {
                     pet.tick();
                 }
             }
+
+            for (Pet pet : pets) {
+                pet.tick();
+            }
         }, 0L, 2L);
     }
 
@@ -52,6 +56,8 @@ public final class PetsAPI {
 
     public static void removeIgnoredPlayer(Player player) {
         ignorePlayers.remove(player.getUniqueId());
+
+        load(player);
     }
 
     static void add(Pet pet) {
@@ -87,16 +93,21 @@ public final class PetsAPI {
     }
 
     static void load(Player player, Pet pet) {
+        pet.spawn(pet.getLocation(), false);
         pet.getEntity().addViewer(player.getUniqueId());
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, pet.getEquip());
     }
 
     static void kill(Player player) {
-        if (!playerPets.containsKey(player.getUniqueId())) return;
         for (Pet pet : getPets(player)) {
+            pet.getEntity().removeViewer(player.getUniqueId());
             pet.getEntity().despawn();
             pet.getEntity().remove();
             playerPets.remove(player.getUniqueId());
+        }
+
+        for (Pet pet : pets) {
+            pet.getEntity().removeViewer(player.getUniqueId());
         }
     }
 
