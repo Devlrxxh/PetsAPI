@@ -40,7 +40,6 @@ public class Pet {
         this.pitch = Float.MAX_VALUE;
         this.customName = "";
         this.floatingAnimation = false;
-        this.world = null;
         this.floatingOffset = 0;
     }
 
@@ -51,7 +50,6 @@ public class Pet {
         this.pitch = Float.MAX_VALUE;
         this.customName = "";
         this.floatingAnimation = false;
-        this.world = null;
         this.floatingOffset = 0;
     }
 
@@ -59,7 +57,7 @@ public class Pet {
         spawn(location, true);
     }
 
-    public void spawn(Location location, boolean add) {
+    protected void spawn(Location location, boolean add) {
         this.world = location.getWorld();
         UUID uuid = UUID.randomUUID();
         int id = EntityLib.getPlatform().getEntityIdProvider().provide(uuid, EntityTypes.ARMOR_STAND);
