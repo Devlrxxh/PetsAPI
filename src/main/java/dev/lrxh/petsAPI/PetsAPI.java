@@ -116,6 +116,12 @@ public final class PetsAPI {
         pets.remove(pet);
     }
 
+    static void kill(Player player, PlayerPet pet) {
+        playerPets.get(player.getUniqueId()).remove(pet);
+        pet.getEntity().despawn();
+        pet.getEntity().remove();
+    }
+
     public static List<Pet> getPets(Player player) {
         if (!playerPets.containsKey(player.getUniqueId())) return new ArrayList<>();
 

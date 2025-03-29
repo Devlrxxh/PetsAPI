@@ -24,6 +24,11 @@ public class PlayerPet extends Pet {
         PetsAPI.add(player, this);
     }
 
+    @Override
+    public void remove() {
+        PetsAPI.kill(player, this);
+    }
+
     public Player getPlayer() {
         return player;
     }
