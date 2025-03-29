@@ -94,7 +94,7 @@ public class Pet {
 
         List<Equipment> equipment = new ArrayList<>();
 
-        equipment.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(skinData.getPlayerHead())));
+        equipment.add(new Equipment(EquipmentSlot.HELMET, SpigotConversionUtil.fromBukkitItemStack(skinData.get())));
 
         equip = new WrapperPlayServerEntityEquipment(armorStand.getEntityId(), equipment);
 

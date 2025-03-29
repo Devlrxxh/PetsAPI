@@ -31,8 +31,8 @@ public final class PetsAPI {
         ignorePlayers = new ArrayList<>();
 
         ViewerEngine viewerEngine = new ViewerEngine();
-        viewerEngine.enable();
         viewerEngine.addViewerRule(user -> !ignorePlayers.contains(user.getUUID()));
+        viewerEngine.enable();
 
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
