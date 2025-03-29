@@ -93,7 +93,6 @@ public final class PetsAPI {
     }
 
     static void load(Player player, Pet pet) {
-        pet.spawn(pet.getLocation(), false);
         pet.getEntity().addViewer(player.getUniqueId());
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, pet.getEquip());
     }

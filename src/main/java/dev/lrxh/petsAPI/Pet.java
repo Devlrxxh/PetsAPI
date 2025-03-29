@@ -35,7 +35,7 @@ public class Pet {
 
     public Pet(SkinData skinData) {
         this.skinData = skinData;
-        this.offset = new Vector(1, 1, 1);
+        this.offset = new Vector(0, 0, 0);
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
         this.customName = "";
@@ -46,7 +46,7 @@ public class Pet {
 
     public Pet(AnimalSkinData animalSkinData) {
         this.skinData = animalSkinData.getSkinData();
-        this.offset = new Vector(1, 1, 1);
+        this.offset = new Vector(0, 0, 0);
         this.yaw = Float.MAX_VALUE;
         this.pitch = Float.MAX_VALUE;
         this.customName = "";

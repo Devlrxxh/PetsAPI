@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class SkinData {
-    private final String value;
+    private String value;
 
     public SkinData(String value) {
         this.value = value;
@@ -42,29 +42,30 @@ public class SkinData {
                 return PetsAPI.skinData.get(name);
             }
 
-            CompletableFuture<String> uuidFuture = getPlayerUUID(name);
-            String uuid = uuidFuture.join();
-
-            if (uuid.isEmpty()) return AnimalSkinData.STEVE.getSkinData();
-
-            CompletableFuture<String> valueFuture = getValue(uuid);
-            String value = valueFuture.join();
-            if (value.isEmpty()) return AnimalSkinData.STEVE.getSkinData();
-
-            SkinData skinData = new SkinData(value);
-
+            SkinData skinData = new SkinData(AnimalSkinData.STEVE.getSkinData().getValue());
             PetsAPI.skinData.put(name, skinData);
+
+            getPlayerUUID(name).thenAccept(uuid -> {
+                if (uuid.isEmpty()) return;
+
+                getValue(uuid).thenAccept(value -> {
+                    if (!value.isEmpty()) {
+                        skinData.setValue(value);
+                    }
+                });
+            });
 
             return skinData;
         }
 
         if (PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
             PlayerProfile profile = player.getPlayerProfile();
-
-            Optional<ProfileProperty> property = profile.getProperties().stream().filter(loopProperty -> loopProperty.getName().equals("textures")).findFirst();
-            return property.map(signedProperty -> new SkinData(signedProperty.getValue())).orElse(null);
+            Optional<ProfileProperty> property = profile.getProperties().stream()
+                    .filter(loopProperty -> loopProperty.getName().equals("textures"))
+                    .findFirst();
+            return property.map(signedProperty -> new SkinData(signedProperty.getValue()))
+                    .orElse(AnimalSkinData.STEVE.getSkinData());
         } else {
-
             EntityPlayer ep = ((CraftPlayer) player).getHandle();
             GameProfile gameProfile = ep.getProfile();
 
@@ -74,6 +75,7 @@ public class SkinData {
                     .orElse(AnimalSkinData.STEVE.getSkinData());
         }
     }
+
 
     private static CompletableFuture<String> getValue(String uuid) {
         return CompletableFuture.supplyAsync(() -> {
@@ -174,5 +176,9 @@ public class SkinData {
 
     public String getValue() {
         return value;
+    }
+
+    private void setValue(String value) {
+        this.value = value;
     }
 }

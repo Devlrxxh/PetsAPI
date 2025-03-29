@@ -11,7 +11,7 @@ public class PetsListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Bukkit.getScheduler().runTaskLater(PetsAPI.instance, () -> {
             PetsAPI.load(event.getPlayer());
-        }, 10L);
+        }, 40L);
     }
 
     @EventHandler
