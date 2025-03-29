@@ -63,7 +63,7 @@ public class PlayerPet extends Pet {
 
         if (isFloatingAnimation()) {
             double FLOATING_SPEED = 0.05;
-            double FLOATING_AMPLITUDE = 0.1;
+            double FLOATING_AMPLITUDE = 0.01;
 
             floatingOffset += FLOATING_SPEED;
             location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
