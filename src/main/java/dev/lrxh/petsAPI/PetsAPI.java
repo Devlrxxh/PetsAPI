@@ -14,11 +14,13 @@ import java.util.*;
 public final class PetsAPI {
     public static JavaPlugin instance;
     static HashMap<String, SkinData> skinData;
-    private static HashMap<UUID, List<PlayerPet>> playerPets;
+    private static HashMap<UUID, Set<PlayerPet>> playerPets;
     private static Set<Pet> pets;
     private static List<UUID> ignorePlayers;
+    static Set<PetInteractEvent> interactions;
 
     public static void init(JavaPlugin plugin) {
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketsListener());
         PacketEvents.getAPI().init();
 
         EntityLib.init(
@@ -29,15 +31,16 @@ public final class PetsAPI {
         skinData = new HashMap<>();
         pets = new HashSet<>();
         ignorePlayers = new ArrayList<>();
+        interactions = new HashSet<>();
 
         ViewerEngine viewerEngine = new ViewerEngine();
-        viewerEngine.addViewerRule(user -> !ignorePlayers.contains(user.getUUID()));
         viewerEngine.enable();
+        viewerEngine.addViewerRule(user -> !ignorePlayers.contains(user.getUUID()));
 
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (List<PlayerPet> pets : playerPets.values()) {
+            for (Set<PlayerPet> pets : playerPets.values()) {
                 for (Pet pet : pets) {
                     pet.tick();
                 }
@@ -47,6 +50,13 @@ public final class PetsAPI {
                 pet.tick();
             }
         }, 0L, 2L);
+
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            for (PetInteractEvent event : new HashSet<>(interactions)) {
+                Bukkit.getPluginManager().callEvent(event);
+                interactions.remove(event);
+            }
+        }, 0L, 4L);
     }
 
 
@@ -72,7 +82,7 @@ public final class PetsAPI {
         if (playerPets.containsKey(player.getUniqueId())) {
             playerPets.get(player.getUniqueId()).add(pet);
         } else {
-            ArrayList<PlayerPet> list = new ArrayList<>();
+            Set<PlayerPet> list = new HashSet<>();
             list.add(pet);
             playerPets.put(player.getUniqueId(), list);
         }
@@ -81,7 +91,7 @@ public final class PetsAPI {
     }
 
     static void load(Player player) {
-        for (List<PlayerPet> pets : playerPets.values()) {
+        for (Set<PlayerPet> pets : playerPets.values()) {
             for (Pet pet : pets) {
                 load(player, pet);
             }
@@ -122,9 +132,19 @@ public final class PetsAPI {
         pet.getEntity().remove();
     }
 
-    public static List<Pet> getPets(Player player) {
-        if (!playerPets.containsKey(player.getUniqueId())) return new ArrayList<>();
+    public static Set<Pet> getPets(Player player) {
+        if (!playerPets.containsKey(player.getUniqueId())) return new HashSet<>();
 
-        return new ArrayList<>(playerPets.get(player.getUniqueId()));
+        return new HashSet<>(playerPets.get(player.getUniqueId()));
+    }
+
+    public static Set<Pet> getAllPets() {
+        Set<Pet> pets = new HashSet<>(PetsAPI.pets);
+
+        for (Set<PlayerPet> petSet : playerPets.values()) {
+            pets.addAll(petSet);
+        }
+
+        return pets;
     }
 }
