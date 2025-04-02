@@ -60,10 +60,11 @@ public class Pet {
 
     protected void spawn(Location location, boolean add) {
         this.world = location.getWorld();
-        UUID uuid = UUID.randomUUID();
-        int id = EntityLib.getPlatform().getEntityIdProvider().provide(uuid, EntityTypes.ARMOR_STAND);
 
-        ArmorStandMeta armorStandMeta = new ArmorStandMeta(id, new Metadata(id));
+        UUID uuid = UUID.randomUUID();
+        int entityId = EntityLib.getPlatform().getEntityIdProvider().provide(uuid, EntityTypes.ARMOR_STAND);
+
+        ArmorStandMeta armorStandMeta = new ArmorStandMeta(entityId, new Metadata(entityId));
         armorStandMeta.setInvisible(true);
 
         if (!PacketEvents.getAPI().getServerManager().getVersion().is(VersionComparison.NEWER_THAN, ServerVersion.V_1_14)) {
@@ -87,7 +88,8 @@ public class Pet {
             }
         }
 
-        armorStand = new WrapperEntity(id, uuid, EntityTypes.ARMOR_STAND, armorStandMeta);
+        armorStand = new WrapperEntity(entityId, uuid, EntityTypes.ARMOR_STAND, armorStandMeta);
+
 
         location.add(offset);
 

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
@@ -17,7 +18,7 @@ public final class PetsAPI {
     private static HashMap<UUID, Set<PlayerPet>> playerPets;
     private static Set<Pet> pets;
     private static List<UUID> ignorePlayers;
-    static Set<PetInteractEvent> interactions;
+    static CopyOnWriteArrayList<PetInteractEvent> interactions;
 
     public static void init(JavaPlugin plugin) {
         PacketEvents.getAPI().getEventManager().registerListener(new PacketsListener());
@@ -31,7 +32,7 @@ public final class PetsAPI {
         skinData = new HashMap<>();
         pets = new HashSet<>();
         ignorePlayers = new ArrayList<>();
-        interactions = new HashSet<>();
+        interactions = new CopyOnWriteArrayList<>();
 
         ViewerEngine viewerEngine = new ViewerEngine();
         viewerEngine.enable();
@@ -52,7 +53,7 @@ public final class PetsAPI {
         }, 0L, 2L);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            for (PetInteractEvent event : new HashSet<>(interactions)) {
+            for (PetInteractEvent event : interactions) {
                 Bukkit.getPluginManager().callEvent(event);
                 interactions.remove(event);
             }
@@ -107,23 +108,22 @@ public final class PetsAPI {
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, pet.getEquip());
     }
 
-    static void kill(Player player) {
-        for (Pet pet : getPets(player)) {
-            pet.getEntity().removeViewer(player.getUniqueId());
-            pet.getEntity().despawn();
-            pet.getEntity().remove();
-            playerPets.remove(player.getUniqueId());
+    static void kill(Player player, boolean onlyRemoveViewer) {
+        if (!onlyRemoveViewer) {
+            for (Pet pet : getPets(player)) {
+                pet.getEntity().remove();
+                playerPets.remove(player.getUniqueId());
+            }
         }
 
-        for (Pet pet : pets) {
+        for (Pet pet : getAllPets()) {
             pet.getEntity().removeViewer(player.getUniqueId());
         }
     }
 
     static void kill(Pet pet) {
-        pet.getEntity().despawn();
-        pet.getEntity().remove();
         pets.remove(pet);
+        pet.getEntity().remove();
     }
 
     static void kill(Player player, PlayerPet pet) {
@@ -136,6 +136,20 @@ public final class PetsAPI {
         if (!playerPets.containsKey(player.getUniqueId())) return new HashSet<>();
 
         return new HashSet<>(playerPets.get(player.getUniqueId()));
+    }
+
+    public static Pet getById(int id) {
+        for (Pet pet : pets) {
+            if (pet.getEntity().getEntityId() == id) return pet;
+        }
+
+        for (Set<PlayerPet> pets : playerPets.values()) {
+            for (PlayerPet pet : pets) {
+                if (pet.getEntity().getEntityId() == id) return pet;
+            }
+        }
+
+        return null;
     }
 
     public static Set<Pet> getAllPets() {

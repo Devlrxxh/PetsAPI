@@ -14,8 +14,9 @@ public class PetsListener implements Listener {
         }, 40L);
     }
 
+
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        PetsAPI.kill(event.getPlayer());
+        PetsAPI.kill(event.getPlayer(), true);
     }
 }
