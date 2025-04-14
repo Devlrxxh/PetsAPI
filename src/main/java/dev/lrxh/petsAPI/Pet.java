@@ -15,6 +15,7 @@ import me.tofaa.entitylib.meta.Metadata;
 import me.tofaa.entitylib.meta.other.ArmorStandMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
@@ -37,20 +38,19 @@ public class Pet {
     public Pet(SkinData skinData) {
         this.skinData = skinData;
         this.offset = new Vector(0, 0, 0);
-        this.yaw = Float.MAX_VALUE;
-        this.pitch = Float.MAX_VALUE;
+        this.yaw = Float.MIN_VALUE;
+        this.pitch = Float.MIN_VALUE;
         this.customName = "";
-        this.floatingAnimation = false;
-        this.floatingOffset = 0;
+        this.floatingAnimation = true;
     }
 
     public Pet(AnimalSkinData animalSkinData) {
         this.skinData = animalSkinData.getSkinData();
         this.offset = new Vector(0, 0, 0);
-        this.yaw = Float.MAX_VALUE;
-        this.pitch = Float.MAX_VALUE;
+        this.yaw = Float.MIN_VALUE;
+        this.pitch = Float.MIN_VALUE;
         this.customName = "";
-        this.floatingAnimation = false;
+        this.floatingAnimation = true;
         this.floatingOffset = 0;
     }
 
@@ -128,6 +128,15 @@ public class Pet {
         return SpigotConversionUtil.toBukkitLocation(world, armorStand.getLocation());
     }
 
+    public void add(float x, float y, float z, float yaw, float pitch) {
+        Location location = SpigotConversionUtil.toBukkitLocation(world, armorStand.getLocation());
+        location.add(x, y, z);
+        location.setYaw(yaw);
+        location.setPitch(pitch);
+
+        armorStand.setLocation(SpigotConversionUtil.fromBukkitLocation(location));
+    }
+
     public float getYaw() {
         return yaw;
     }
@@ -173,22 +182,21 @@ public class Pet {
 
         location.add(getOffset());
 
-        if (getYaw() != Float.MAX_VALUE) {
+        if (getYaw() != Float.MIN_VALUE) {
             location.setYaw(getYaw());
         }
 
-        if (getPitch() != Float.MAX_VALUE) {
+        if (getPitch() != Float.MIN_VALUE) {
             location.setPitch(getPitch());
         }
 
         if (isFloatingAnimation()) {
-            double FLOATING_SPEED = 0.05;
-            double FLOATING_AMPLITUDE = 0.01;
+            double FLOATING_SPEED = 0.1;
+            double FLOATING_AMPLITUDE = 0.1;
 
             floatingOffset += FLOATING_SPEED;
             location.setY(location.getY() + Math.sin(floatingOffset) * FLOATING_AMPLITUDE);
         }
-
         getEntity().teleport(SpigotConversionUtil.fromBukkitLocation(location));
     }
 }

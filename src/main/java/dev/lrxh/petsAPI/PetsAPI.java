@@ -4,6 +4,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform;
+import me.tofaa.entitylib.storage.EntityStorage;
+import me.tofaa.entitylib.storage.FSEntityStorage;
 import me.tofaa.entitylib.ve.ViewerEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -41,15 +43,17 @@ public final class PetsAPI {
         instance.getServer().getPluginManager().registerEvents(new PetsListener(), instance);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (Set<PlayerPet> pets : playerPets.values()) {
-                for (Pet pet : pets) {
+            for (Set<PlayerPet> pets : new HashSet<>(playerPets.values())) {
+                for (PlayerPet pet : pets) {
                     pet.tick();
                 }
             }
 
-            for (Pet pet : pets) {
+            for (Pet pet : new HashSet<>(pets)) {
                 pet.tick();
+
             }
+
         }, 0L, 2L);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -57,7 +61,7 @@ public final class PetsAPI {
                 Bukkit.getPluginManager().callEvent(event);
                 interactions.remove(event);
             }
-        }, 0L, 4L);
+        }, 0L, 2L);
     }
 
 
@@ -117,7 +121,7 @@ public final class PetsAPI {
         }
 
         for (Pet pet : getAllPets()) {
-            pet.getEntity().removeViewer(player.getUniqueId());
+            pet.getEntity().removeViewerSilently(player.getUniqueId());
         }
     }
 
@@ -128,7 +132,6 @@ public final class PetsAPI {
 
     static void kill(Player player, PlayerPet pet) {
         playerPets.get(player.getUniqueId()).remove(pet);
-        pet.getEntity().despawn();
         pet.getEntity().remove();
     }
 
