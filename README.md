@@ -20,7 +20,7 @@ Fired when a player interacts with a pet.
 1. Clone repo
 2. ```run mvn install```
 3. Add this to pom.xml
-   ```
+   ```xml
    <dependency>
        <groupId>dev.lrxh</groupId>
        <artifactId>PetsAPI</artifactId>
