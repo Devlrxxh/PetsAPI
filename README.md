@@ -31,13 +31,9 @@ Fired when a player interacts with a pet.
 ```java
 PetsAPI.init(this);
 
-Player player = ...;
-PlayerPet pet = new PlayerPet(SkinData.ofPlayerName(player.getName()));
-pet.spawn(player);
-
 // Example Player Pet
 Player player = ...;
-PlayerPet pet = new PlayerPet(AnimalSkinData.COW);
+PlayerPet pet = new PlayerPet(SkinData.ofPlayerName(player.getName()));
 pet.setLookAtPlayer(true);
 pet.spawn(player);
 
