@@ -4,6 +4,18 @@ Fully packet based PetsAPI (1.8 - 1.21) using [PacketEvents](https://github.com/
 > [!IMPORTANT]
 > Project version is required to be Java 16 at least!
 
+# Info
+PetsAPI allows you to place floating heads in the world or attach them as pets that follow players — all fully packet-based.
+
+# Events
+### PetInteractEvent
+
+Fired when a player interacts with a pet.
+
+**Accessors:**
+- `getPlayer()` → The player who clicked the pet
+- `getPet()` → The clicked pet
+
 # Setup
 1. Clone repo
 2. ```run mvn install```
@@ -17,17 +29,22 @@ Fully packet based PetsAPI (1.8 - 1.21) using [PacketEvents](https://github.com/
    ```
 # Example Usage
 ```java
-PetsAPI.init(this)
+PetsAPI.init(this);
 
-Player player = ...
+Player player = ...;
 PlayerPet pet = new PlayerPet(SkinData.ofPlayerName(player.getName()));
 pet.spawn(player);
 
-// Example Animal Head
-Player player = ...
+// Example Player Pet
+Player player = ...;
 PlayerPet pet = new PlayerPet(AnimalSkinData.COW);
 pet.setLookAtPlayer(true);
 pet.spawn(player);
+
+// Example World Pet
+Pet pet = new Pet(AnimalSkinData.SHEEP);
+Location location = ...;
+pet.spawn(location);
 
 // Remove player pets
 for (Pet pet : PetsAPI.getPets(player)) {
