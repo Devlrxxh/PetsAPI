@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
 
 public final class PetsAPI {
     public static JavaPlugin instance;
@@ -162,6 +163,6 @@ public final class PetsAPI {
             pets.addAll(petSet);
         }
 
-        return pets;
+        return Collections.unmodifiableSet(pets);
     }
 }
